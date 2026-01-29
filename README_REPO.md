@@ -2,6 +2,8 @@
 
 Fine-tuning de reconocimiento de atributos humanos usando el dataset PA-100k (100,000 imágenes) con PyTorch + CUDA.
 
+> 📖 **[Ver flujo completo paso a paso](WORKFLOW.md)** - Documentación detallada desde cero hasta prueba con video
+
 ## 🎯 Características
 
 - **27 Atributos** detectados:
