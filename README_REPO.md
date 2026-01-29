@@ -109,6 +109,8 @@ PA-110k/
 ├── train_pytorch.py             # Script de entrenamiento
 ├── add_male_attribute.py        # Agregar atributo Male
 ├── convert_to_paddle.py         # Convertir dataset
+├── download_pphuman.py          # Descargar modelo PP-Human (baseline)
+├── export_onnx.py               # Convertir modelos Paddle a ONNX
 ├── download_test_video.py       # Descargar video de prueba
 ├── test_attributes_cpu.py       # Test con CPU
 ├── .gitignore                   # Excluye modelos, videos, ZIPs
@@ -133,6 +135,14 @@ PA-110k/
 ```
 
 ## 🎮 Uso
+
+### Descargar modelo PP-Human (opcional, para comparación)
+
+```bash
+python download_pphuman.py
+```
+
+Descarga el modelo PP-Human pre-entrenado (PPLCNet x1.0, 26 atributos) para comparar con el modelo fine-tuned de PA-100k (27 atributos).
 
 ### Descargar video de prueba
 
