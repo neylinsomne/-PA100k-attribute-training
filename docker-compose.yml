@@ -1,0 +1,61 @@
+services:
+  pa100k-training:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pa100k-attribute-training:latest
+    container_name: pa100k_training
+
+    # GPU support
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+    # Volumes
+    volumes:
+      # Dataset (read-only for safety)
+      - ./release_data/release_data:/workspace/images:ro
+      - ./paddle_format:/workspace/paddle_format:ro
+
+      # Output (read-write)
+      - ./output_pytorch:/workspace/output_pytorch
+
+      # Training script (for live editing)
+      - ./train_pytorch.py:/workspace/train_pytorch.py
+
+    # Environment
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTHONUNBUFFERED=1
+
+    # Command (can override)
+    command: python3 train_pytorch.py
+
+    # Network mode
+    network_mode: bridge
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # TensorBoard for monitoring (optional)
+  tensorboard:
+    image: tensorflow/tensorflow:latest
+    container_name: pa100k_tensorboard
+    ports:
+      - "6006:6006"
+    volumes:
+      - ./output_pytorch:/workspace/output_pytorch:ro
+    command: tensorboard --logdir /workspace/output_pytorch --host 0.0.0.0
+    profiles:
+      - monitoring

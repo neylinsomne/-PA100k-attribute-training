@@ -1,0 +1,83 @@
+# Modelos entrenados y pre-entrenados
+*.pth
+*.onnx
+*.pdparams
+*.pdmodel
+*.pdiparams
+*.pdopt
+*.tar
+*.weights
+
+# Datasets y archivos grandes
+*.zip
+data.zip
+annotation.zip
+*.mat
+release_data/
+paddle_format/images/
+
+# Videos
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# Outputs del entrenamiento
+output/
+output_pytorch/
+checkpoints/
+logs/
+vdl_log/
+
+# Cache de modelos descargados
+pretrained_models/
+weights/
+.cache/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+training.log
+training_error.log
+
+# Docker
+.dockerignore
+
+# Temporal
+tmp/
+temp/
+*.tmp
+
+# OS
+.DS_Store
+Thumbs.db

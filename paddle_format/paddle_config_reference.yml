@@ -1,0 +1,34 @@
+
+# PaddleDetection Configuration for PA-100k Attribute Recognition
+# Place this in PaddleDetection/configs/pedestrian_attribute/
+
+# Model: StrongBaseline (PPLCNet_x1_0)
+architecture: StrongBaseline
+
+# Dataset
+TrainDataset:
+  name: MultiLabelDataset
+  image_dir: E:\Proyects\FIneData\PA-110k\paddle_format/images/train_source
+  anno_path: E:\Proyects\FIneData\PA-110k\paddle_format/train.txt
+  label_list: E:\Proyects\FIneData\PA-110k\paddle_format/attributes.txt
+
+ValDataset:
+  name: MultiLabelDataset
+  image_dir: E:\Proyects\FIneData\PA-110k\paddle_format/images/val_source
+  anno_path: E:\Proyects\FIneData\PA-110k\paddle_format/val.txt
+  label_list: E:\Proyects\FIneData\PA-110k\paddle_format/attributes.txt
+
+TestDataset:
+  name: MultiLabelDataset
+  image_dir: E:\Proyects\FIneData\PA-110k\paddle_format/images/test_source
+  anno_path: E:\Proyects\FIneData\PA-110k\paddle_format/test.txt
+  label_list: E:\Proyects\FIneData\PA-110k\paddle_format/attributes.txt
+
+# Training hyperparameters
+epoch: 60
+batch_size: 64
+learning_rate: 0.001
+num_classes: 26
+
+# Image preprocessing
+image_shape: [3, 256, 192]

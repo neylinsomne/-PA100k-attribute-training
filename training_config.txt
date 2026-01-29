@@ -1,0 +1,223 @@
+====================================================================
+PA-100k Fine-Tuning Configuration Summary
+====================================================================
+
+Dataset: PA-100k (100,000 pedestrian images)
+Split: 80,000 train / 10,000 val / 10,000 test
+
+====================================================================
+Attributes (27 total)
+====================================================================
+
+1. Female              - Gender (female)
+2. Male                - Gender (male) [ADDED - derived from Female]
+3. AgeOver60           - Age over 60 years
+4. Age18-60            - Age between 18-60 years
+5. AgeLess18           - Age less than 18 years
+6. Front               - Person facing front
+7. Side                - Person in side view
+8. Back                - Person facing back
+9. Hat                 - Wearing hat
+10. Glasses            - Wearing glasses
+11. HandBag            - Carrying hand bag
+12. ShoulderBag        - Carrying shoulder bag
+13. Backpack           - Carrying backpack
+14. HoldObjectsInFront - Holding objects in front
+15. ShortSleeve        - Short sleeve upper garment
+16. LongSleeve         - Long sleeve upper garment
+17. UpperStride        - Striped upper garment
+18. UpperLogo          - Upper garment with logo
+19. UpperPlaid         - Plaid upper garment
+20. UpperSplice        - Spliced upper garment
+21. LowerStripe        - Striped lower garment
+22. LowerPattern       - Patterned lower garment
+23. LongCoat           - Wearing long coat
+24. Trousers           - Wearing trousers
+25. Shorts             - Wearing shorts
+26. Skirt&Dress        - Wearing skirt or dress
+27. boots              - Wearing boots
+
+====================================================================
+Training Hyperparameters
+====================================================================
+
+Epochs:              60
+Batch Size:          64
+Learning Rate:       0.001 (initial)
+  - Decay at:        Epoch 30 (x0.1), Epoch 45 (x0.1)
+  - Warmup:          500 steps (linear, factor=0.1)
+
+Optimizer:           Adam
+  - L2 Regularization: 0.0001
+
+Input Size:          256 x 192 (H x W)
+Normalization:       ImageNet (mean=[0.485, 0.456, 0.406],
+                               std=[0.229, 0.224, 0.225])
+
+====================================================================
+Data Augmentation
+====================================================================
+
+Training:
+  - RandomCrop:      prob=0.5
+  - RandomFlip:      prob=0.5
+  - Resize:          256x192
+  - Normalize:       ImageNet stats
+
+Validation/Test:
+  - Resize:          256x192
+  - Normalize:       ImageNet stats
+
+====================================================================
+Model Architecture
+====================================================================
+
+Architecture:        StrongBaseline
+Backbone:            PPLCNet_x1_0 (lightweight CNN)
+Pretrained Weights:  ImageNet (PPLCNet_x1_0)
+Transfer Learning:   PP-Human Attribute 945 checkpoint
+
+Output Layer:        27-class multi-label classification
+Loss Function:       Binary Cross-Entropy (multi-label)
+Activation:          Sigmoid (per-attribute probability)
+
+====================================================================
+Expected Performance (Training Set Statistics)
+====================================================================
+
+Gender:
+  - Female:          45.6% positive
+  - Male:            54.4% positive
+
+Age:
+  - AgeOver60:       1.4% positive
+  - Age18-60:        93.4% positive
+  - AgeLess18:       5.2% positive
+
+Bags:
+  - HandBag:         18.4% positive
+  - ShoulderBag:     19.1% positive
+  - Backpack:        14.8% positive
+
+Most Common Attributes:
+  - Age18-60:        93.4%
+  - Trousers:        70.9%
+  - ShortSleeve:     58.6%
+  - Male:            54.4%
+  - LongSleeve:      41.4%
+
+Rare Attributes (challenging):
+  - boots:           0.6%
+  - LowerStripe:     0.5%
+  - HoldObjectsInFront: 1.0%
+  - AgeOver60:       1.4%
+
+====================================================================
+Training Time Estimate (GPU-dependent)
+====================================================================
+
+With RTX 3060/3070 (8-12GB VRAM):
+  - Per epoch:       ~8-12 minutes (80k images, batch=64)
+  - Total (60 epochs): ~8-12 hours
+
+With RTX 4060 Ti/4070 (8-16GB VRAM):
+  - Per epoch:       ~5-8 minutes
+  - Total (60 epochs): ~5-8 hours
+
+With A100/4090 (24GB+ VRAM):
+  - Per epoch:       ~3-5 minutes
+  - Total (60 epochs): ~3-5 hours
+
+Note: First epoch is slower due to data loading initialization
+
+====================================================================
+Output Files
+====================================================================
+
+During Training:
+  - output/pa100k_attribute/model_epoch_*.pdparams
+  - output/pa100k_attribute/model_final.pdparams
+  - output/pa100k_attribute/vdl_log/ (VisualDL logs)
+
+After Export:
+  - output/onnx_export/human_attr_finetuned.onnx (for deployment)
+  - output/onnx_export/model/ (Paddle inference model)
+
+====================================================================
+Evaluation Metrics
+====================================================================
+
+Per Epoch:
+  - mA (mean Accuracy):  Average accuracy across 27 attributes
+  - Precision:           Positive prediction precision
+  - Recall:              Positive prediction recall
+  - F1-Score:            Harmonic mean of precision/recall
+
+Target Performance (after 60 epochs):
+  - mA:       > 0.80 (80% mean accuracy)
+  - F1-Score: > 0.75
+
+====================================================================
+Commands
+====================================================================
+
+Start Training:
+  python finetune_attributes.py
+
+Resume Training:
+  python finetune_attributes.py --resume
+
+Evaluate Only:
+  python finetune_attributes.py --eval
+
+Export to ONNX:
+  python finetune_attributes.py --export-only
+
+Monitor Training:
+  visualdl --logdir output/pa100k_attribute/vdl_log --port 8040
+
+====================================================================
+Integration with DeepStream
+====================================================================
+
+After training completes:
+
+1. Copy ONNX model:
+   cp output/onnx_export/human_attr_finetuned.onnx \
+      ../../Computer_vision/inference/weights/human_attr/
+
+2. Create processor (if not exists):
+   - Add AttributeProcessor in inference/processors/
+   - Load ONNX model with ONNX Runtime
+   - Process person bounding boxes from primary detector
+
+3. Update main_ds.py:
+   - Initialize AttributeProcessor
+   - Call on detected persons
+   - Send results to NATS
+
+4. Test with video:
+   python simulator/download_videos.py  # Downloads attributes_sim.mp4
+   python inference/main_ds.py          # Run pipeline
+
+====================================================================
+Troubleshooting
+====================================================================
+
+Out of Memory (OOM):
+  - Reduce batch_size to 32 or 16
+  - Use gradient accumulation
+  - Reduce image size to 192x128
+
+Slow Training:
+  - Use mixed precision (AMP)
+  - Increase batch_size if VRAM allows
+  - Use faster data loading (num_workers)
+
+Poor Accuracy:
+  - Train longer (100 epochs)
+  - Use stronger backbone (ResNet-50)
+  - Add more augmentation
+  - Check for class imbalance
+
+====================================================================
