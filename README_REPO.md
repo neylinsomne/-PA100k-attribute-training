@@ -103,10 +103,11 @@ python train_pytorch.py
 
 ```
 PA-110k/
-├── setup_and_train.py          # Orquestador automático
+├── setup_and_train.py           # Orquestador automático
 ├── train_pytorch.py             # Script de entrenamiento
 ├── add_male_attribute.py        # Agregar atributo Male
 ├── convert_to_paddle.py         # Convertir dataset
+├── download_test_video.py       # Descargar video de prueba
 ├── test_attributes_cpu.py       # Test con CPU
 ├── .gitignore                   # Excluye modelos, videos, ZIPs
 ├── README_REPO.md               # Este archivo
@@ -118,6 +119,9 @@ PA-110k/
 │   ├── test.txt                 # 10,000 samples
 │   └── attributes.txt           # 27 nombres de atributos
 │
+├── test_videos/                 # Videos de prueba
+│   └── attributes_sim.mp4       # Video descargado de YouTube
+│
 └── output_pytorch/              # Outputs (generado al entrenar)
     ├── checkpoints/
     │   ├── best_model.pth       # Mejor modelo
@@ -127,6 +131,12 @@ PA-110k/
 ```
 
 ## 🎮 Uso
+
+### Descargar video de prueba
+
+```bash
+python download_test_video.py
+```
 
 ### Entrenar desde cero
 
@@ -150,6 +160,16 @@ python train_pytorch.py --eval-only --resume output_pytorch/checkpoints/best_mod
 
 ```bash
 python train_pytorch.py --export-only
+```
+
+### Probar modelo entrenado
+
+```bash
+# Descargar video de prueba (si no lo has hecho)
+python download_test_video.py
+
+# Probar con CPU
+python test_attributes_cpu.py
 ```
 
 ## 🐳 Docker (Alternativo)
